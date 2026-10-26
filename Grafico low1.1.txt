@@ -1,0 +1,549 @@
+--=============================================================
+--  PESADÃO SUPREMO  ·  v3  ·  GUI PRIMEIRO
+--  A GUI nasce antes de tudo. Se algo falhar, o erro
+--  aparece ESCRITO dentro do painel.
+--=============================================================
+if _G.__PSX_KILL then pcall(_G.__PSX_KILL) end
+
+local Players     = game:GetService("Players")
+local RunService  = game:GetService("RunService")
+local Lighting    = game:GetService("Lighting")
+local Workspace   = game:GetService("Workspace")
+local UIS         = game:GetService("UserInputService")
+local UGS         = game:GetService("UserGameSettings")
+local StarterGui  = game:GetService("StarterGui")
+local Tween       = game:GetService("TweenService")
+
+local LP = Players.LocalPlayer
+local PG = LP:WaitForChild("PlayerGui")
+
+local C = {
+	bg   = Color3.fromRGB(14, 14, 18),
+	top  = Color3.fromRGB(22, 22, 28),
+	btn  = Color3.fromRGB(40, 40, 50),
+	on   = Color3.fromRGB(0, 165, 105),
+	off  = Color3.fromRGB(52, 52, 62),
+	acc  = Color3.fromRGB(0, 170, 255),
+	red  = Color3.fromRGB(210, 60, 60),
+	txt  = Color3.fromRGB(235, 235, 242),
+	dim  = Color3.fromRGB(130, 130, 145),
+}
+
+--=================== GUI PRIMEIRO ============================
+local old = PG:FindFirstChild("PSX_V3")
+if old then old:Destroy() end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "PSX_V3"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.DisplayOrder = 100
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+gui.Parent = PG
+
+local main = Instance.new("Frame")
+main.Name = "Painel"
+main.Size = UDim2.new(0, 290, 0, 460)
+main.Position = UDim2.new(0, 80, 0, 70)
+main.BackgroundColor3 = C.bg
+main.BorderSizePixel = 0
+main.Active = true
+main.Visible = true
+main.ZIndex = 10
+main.Parent = gui
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 12)
+
+local stroke = Instance.new("UIStroke", main)
+stroke.Color = Color3.fromRGB(45, 45, 58)
+stroke.Thickness = 1
+
+local top = Instance.new("Frame")
+top.Size = UDim2.new(1, 0, 0, 36)
+top.BackgroundColor3 = C.top
+top.BorderSizePixel = 0
+top.Parent = main
+Instance.new("UICorner", top).CornerRadius = UDim.new(0, 12)
+
+local lblTitle = Instance.new("TextLabel")
+lblTitle.Size = UDim2.new(1, -80, 1, 0)
+lblTitle.Position = UDim2.new(0, 10, 0, 0)
+lblTitle.BackgroundTransparency = 1
+lblTitle.Text = "PESADÃO SUPREMO v3"
+lblTitle.TextColor3 = C.txt
+lblTitle.Font = Enum.Font.GothamBold
+lblTitle.TextSize = 13
+lblTitle.TextXAlignment = Enum.TextXAlignment.Left
+lblTitle.Parent = top
+
+local lblFps = Instance.new("TextLabel")
+lblFps.Size = UDim2.new(0, 70, 1, 0)
+lblFps.Position = UDim2.new(1, -80, 0, 0)
+lblFps.BackgroundTransparency = 1
+lblFps.Text = "FPS: --"
+lblFps.TextColor3 = C.acc
+lblFps.Font = Enum.Font.GothamBold
+lblFps.TextSize = 13
+lblFps.TextXAlignment = Enum.TextXAlignment.Right
+lblFps.Parent = top
+
+local btnClose = Instance.new("TextButton")
+btnClose.Size = UDim2.new(0, 26, 0, 26)
+btnClose.Position = UDim2.new(1, -32, 0, 5)
+btnClose.BackgroundColor3 = C.off
+btnClose.Text = "X"
+btnClose.TextColor3 = C.txt
+btnClose.Font = Enum.Font.GothamBold
+btnClose.TextSize = 13
+btnClose.BorderSizePixel = 0
+btnClose.Parent = top
+Instance.new("UICorner", btnClose).CornerRadius = UDim.new(0, 6)
+btnClose.MouseButton1Click:Connect(function() main.Visible = false end)
+
+local lblStatus = Instance.new("TextLabel")
+lblStatus.Size = UDim2.new(1, -14, 0, 26)
+lblStatus.Position = UDim2.new(0, 7, 1, -30)
+lblStatus.BackgroundTransparency = 1
+lblStatus.Text = "STATUS: carregando..."
+lblStatus.TextColor3 = C.dim
+lblStatus.Font = Enum.Font.Code
+lblStatus.TextSize = 11
+lblStatus.TextXAlignment = Enum.TextXAlignment.Left
+lblStatus.TextWrapped = true
+lblStatus.Parent = main
+
+local scroll = Instance.new("ScrollingFrame")
+scroll.Size = UDim2.new(1, -14, 1, -72)
+scroll.Position = UDim2.new(0, 7, 0, 40)
+scroll.BackgroundTransparency = 1
+scroll.BorderSizePixel = 0
+scroll.ScrollBarThickness = 3
+scroll.ScrollBarImageColor3 = C.acc
+scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+scroll.Parent = main
+
+local list = Instance.new("UIListLayout")
+list.Padding = UDim.new(0, 5)
+list.SortOrder = Enum.SortOrder.LayoutOrder
+list.Parent = scroll
+
+local fab = Instance.new("TextButton")
+fab.Name = "BotaoP"
+fab.Size = UDim2.new(0, 58, 0, 58)
+fab.Position = UDim2.new(0, 12, 0, 110)
+fab.BackgroundColor3 = C.acc
+fab.Text = "P"
+fab.TextColor3 = Color3.new(1,1,1)
+fab.Font = Enum.Font.GothamBold
+fab.TextSize = 26
+fab.BorderSizePixel = 0
+fab.Active = true
+fab.ZIndex = 100
+fab.Parent = gui
+Instance.new("UICorner", fab).CornerRadius = UDim.new(1, 0)
+
+local function status(txt, cor)
+	lblStatus.Text = "STATUS: " .. tostring(txt)
+	lblStatus.TextColor3 = cor or C.dim
+end
+
+--=================== DRAG ====================================
+do
+	local d, sp, st
+	top.InputBegan:Connect(function(i)
+		if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then
+			d, sp, st = true, i.Position, main.Position
+		end
+	end)
+	top.InputEnded:Connect(function(i)
+		if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then d = false end
+	end)
+	UIS.InputChanged:Connect(function(i)
+		if not d then return end
+		if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseMovement then
+			local v = i.Position - sp
+			main.Position = UDim2.new(st.X.Scale, st.X.Offset + v.X, st.Y.Scale, st.Y.Offset + v.Y)
+		end
+	end)
+end
+
+do
+	local d, sp, st, mv
+	fab.InputBegan:Connect(function(i)
+		if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then
+			d, mv, sp, st = true, false, i.Position, fab.Position
+		end
+	end)
+	UIS.InputChanged:Connect(function(i)
+		if not d then return end
+		if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseMovement then
+			local v = i.Position - sp
+			if math.abs(v.X) > 8 or math.abs(v.Y) > 8 then mv = true end
+			fab.Position = UDim2.new(st.X.Scale, st.X.Offset + v.X, st.Y.Scale, st.Y.Offset + v.Y)
+		end
+	end)
+	fab.InputEnded:Connect(function(i)
+		if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then
+			d = false
+			if not mv then main.Visible = not main.Visible end
+		end
+	end)
+end
+
+status("GUI criada OK")
+
+--=================== RESTO (protegido) =======================
+local okRun, errRun = xpcall(function()
+
+local CONNS = {}
+local function bind(c) CONNS[#CONNS+1] = c return c end
+local function try(f, ...) local o, r = pcall(f, ...) if o then return r end end
+
+local CFG = {
+	FPS = 60, Qual = "BAIXA", Dist = 350,
+	SombrasOff = true, AnimOff = true, TexMin = true,
+	Brutal = true, Culling = true, AutoFechar = true,
+}
+
+local QUAL = {
+	["EXTREMA BAIXA"] = { lvl = Enum.QualityLevel.Level01, saved = Enum.SavedQualitySetting.QualityLevel1 },
+	["BAIXA"]         = { lvl = Enum.QualityLevel.Level03, saved = Enum.SavedQualitySetting.QualityLevel3 },
+	["NORMAL"]        = { lvl = Enum.QualityLevel.Level05, saved = Enum.SavedQualitySetting.QualityLevel5 },
+}
+
+local BK = { fx = {}, light = {},
+	mat = setmetatable({}, {__mode="k"}),
+	refl = setmetatable({}, {__mode="k"}),
+	sh = setmetatable({}, {__mode="k"}) }
+
+local HAS_S = false
+pcall(function() HAS_S = settings() ~= nil end)
+local function setR(k, v) if HAS_S then pcall(function() settings().Rendering[k] = v end) end end
+
+local function aplicarTexturas(on)
+	CFG.TexMin = on
+	if not on then return end
+	setR("QualityLevel", Enum.QualityLevel.Level01)
+	for _, d in ipairs(Workspace:GetDescendants()) do
+		if d:IsA("BasePart") and not d:IsA("Terrain") then
+			if BK.mat[d] == nil then BK.mat[d] = d.Material end
+			if BK.refl[d] == nil then BK.refl[d] = d.Reflectance end
+			try(function() d.Material = Enum.Material.SmoothPlastic d.Reflectance = 0 end)
+		end
+	end
+end
+
+local fpsConn
+local function aplicarFPS(n)
+	CFG.FPS = n
+	if fpsConn then fpsConn:Disconnect() fpsConn = nil end
+	try(function() UGS.FramerateCap = n end)
+	local nat = try(function()
+		if type(setfpscap) == "function" then setfpscap(n) return true end
+		return false
+	end)
+	if not nat then
+		local alvo, last = 1/n, os.clock()
+		fpsConn = bind(RunService.RenderStepped:Connect(function()
+			local now = os.clock() local dif = now - last
+			if dif < alvo then task.wait(alvo - dif) end
+			last = os.clock()
+		end))
+	end
+end
+
+local function aplicarSombras(off)
+	CFG.SombrasOff = off
+	try(function() Lighting.GlobalShadows = not off end)
+	for _, d in ipairs(Workspace:GetDescendants()) do
+		if d:IsA("BasePart") then
+			if BK.sh[d] == nil then BK.sh[d] = d.CastShadow end
+			try(function() d.CastShadow = not off end)
+		end
+	end
+end
+
+local animConn = setmetatable({}, {__mode="k"})
+local function pararTracks(o)
+	local ok, t = pcall(function() return o:GetPlayingAnimationTracks() end)
+	if ok and t then for _, x in ipairs(t) do pcall(function() x:Stop(0) end) end end
+end
+local function hookAnim(o)
+	if animConn[o] then return end
+	local ok, c = pcall(function()
+		return o.AnimationPlayed:Connect(function(tr)
+			task.defer(function() pcall(function() tr:Stop(0) end) end)
+		end)
+	end)
+	if ok then animConn[o] = c end
+	pararTracks(o)
+end
+local function aplicarAnim(off)
+	CFG.AnimOff = off
+	if not off then return end
+	for _, d in ipairs(Workspace:GetDescendants()) do
+		if d:IsA("Animator") or d:IsA("AnimationController") then hookAnim(d) end
+	end
+end
+
+local function aplicarQualidade(nome)
+	local q = QUAL[nome]
+	if not q then return end
+	CFG.Qual = nome
+	setR("QualityLevel", q.lvl)
+	try(function() UGS.SavedQualityLevel = q.saved end)
+end
+
+local function aplicarRender(dist)
+	CFG.Dist = dist
+	try(function() if Workspace.StreamingEnabled then Workspace.StreamingTargetRadius = dist end end)
+	if BK.light.fs == nil then BK.light.fs = Lighting.FogStart BK.light.fe = Lighting.FogEnd end
+	try(function() Lighting.FogStart = dist * 0.55 Lighting.FogEnd = dist * 1.05 end)
+end
+
+local parts, ch, idx = {}, {}, 1
+local function rebuild()
+	local t, n = {}, 0
+	for _, d in ipairs(Workspace:GetDescendants()) do
+		if d:IsA("BasePart") and not d:IsA("Terrain") then n += 1 t[n] = d end
+	end
+	parts, idx, ch = t, 1, {}
+	if LP.Character then
+		for _, d in ipairs(LP.Character:GetDescendants()) do ch[d] = true end
+	end
+end
+local function limparCulling()
+	for _, p in ipairs(parts) do try(function() p.LocalTransparencyModifier = 0 end) end
+end
+bind(RunService.Heartbeat:Connect(function()
+	if not CFG.Culling or #parts == 0 or not Workspace.CurrentCamera then return end
+	local cp = Workspace.CurrentCamera.CFrame.Position
+	local l2 = CFG.Dist * CFG.Dist
+	local n = #parts
+	for _ = 1, math.max(150, math.ceil(n/6)) do
+		idx += 1 if idx > n then idx = 1 end
+		local p = parts[idx]
+		if p and p.Parent then
+			local w = 0
+			if not ch[p] then
+				local v = p.Position - cp
+				if v.X*v.X + v.Y*v.Y + v.Z*v.Z > l2 then w = 1 end
+			end
+			if p.LocalTransparencyModifier ~= w then p.LocalTransparencyModifier = w end
+		end
+	end
+end))
+
+local function aplicarBrutal(on)
+	CFG.Brutal = on
+	if not on then return end
+	for _, e in ipairs(Lighting:GetChildren()) do
+		if e:IsA("PostEffect") then
+			if BK.fx[e] == nil then BK.fx[e] = e.Enabled end
+			try(function() e.Enabled = false end)
+		elseif e:IsA("Atmosphere") then
+			if BK.fx[e] == nil then BK.fx[e] = e.Density end
+			try(function() e.Density = 0 end)
+		end
+	end
+	try(function() Lighting.EnvironmentDiffuseScale = 0 Lighting.EnvironmentSpecularScale = 0 end)
+	local ter = Workspace:FindFirstChildOfClass("Terrain")
+	if ter then try(function()
+		ter.Decoration = false ter.WaterWaveSize = 0 ter.WaterWaveSpeed = 0 ter.WaterReflectance = 0
+	end) end
+	for _, d in ipairs(Workspace:GetDescendants()) do
+		if d:IsA("ParticleEmitter") then
+			if d.Rate > 15 then d.Rate = 15 end
+		elseif d:IsA("Trail") or d:IsA("Beam") or d:IsA("Smoke") or d:IsA("Fire") or d:IsA("Sparkles") then
+			try(function() d.Enabled = false end)
+		end
+	end
+	try(function() StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false) end)
+end
+
+bind(Workspace.DescendantAdded:Connect(function(d)
+	if d:IsA("BasePart") then
+		if CFG.SombrasOff then try(function() d.CastShadow = false end) end
+		if CFG.TexMin then try(function() d.Material = Enum.Material.SmoothPlastic d.Reflectance = 0 end) end
+	elseif d:IsA("Animator") or d:IsA("AnimationController") then
+		if CFG.AnimOff then hookAnim(d) end
+	end
+end))
+
+local function restaurar()
+	if fpsConn then fpsConn:Disconnect() fpsConn = nil end
+	for e, v in pairs(BK.fx) do
+		if typeof(e) == "Instance" and e.Parent then
+			pcall(function() e.Enabled = v end)
+		end
+	end
+	BK.fx = {}
+	if BK.light.fs then
+		pcall(function() Lighting.FogStart = BK.light.fs end)
+		pcall(function() Lighting.FogEnd = BK.light.fe end)
+	end
+	try(function() Lighting.GlobalShadows = true Lighting.EnvironmentDiffuseScale = 1 Lighting.EnvironmentSpecularScale = 1 end)
+	for p, m in pairs(BK.mat) do if p.Parent then pcall(function() p.Material = m end) end end
+	for p, r in pairs(BK.refl) do if p.Parent then pcall(function() p.Reflectance = r end) end end
+	for p, s in pairs(BK.sh) do if p.Parent then pcall(function() p.CastShadow = s end) end end
+	BK.mat = setmetatable({}, {__mode="k"})
+	BK.refl = setmetatable({}, {__mode="k"})
+	BK.sh = setmetatable({}, {__mode="k"})
+	limparCulling()
+end
+
+--================= BOTÕES DO PAINEL ==========================
+local function header(txt)
+	local l = Instance.new("TextLabel")
+	l.Size = UDim2.new(1, 0, 0, 18)
+	l.BackgroundTransparency = 1
+	l.Text = txt l.TextColor3 = C.dim
+	l.Font = Enum.Font.GothamBold l.TextSize = 11
+	l.TextXAlignment = Enum.TextXAlignment.Left
+	l.Parent = scroll
+end
+local function row()
+	local f = Instance.new("Frame")
+	f.Size = UDim2.new(1, 0, 0, 34)
+	f.BackgroundTransparency = 1 f.Parent = scroll
+	local l = Instance.new("UIListLayout", f)
+	l.FillDirection = Enum.FillDirection.Horizontal
+	l.Padding = UDim.new(0, 6)
+	return f
+end
+local grupos = {}
+local function btn(pai, txt, w, grupo, chave, cb)
+	local b = Instance.new("TextButton")
+	b.Size = UDim2.new(0, w, 0, 34)
+	b.BackgroundColor3 = C.btn b.TextColor3 = C.txt
+	b.Font = Enum.Font.GothamBold b.TextSize = 12 b.Text = txt
+	b.BorderSizePixel = 0 b.AutoButtonColor = false b.Parent = pai
+	Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
+	if grupo then
+		grupos[grupo] = grupos[grupo] or {}
+		table.insert(grupos[grupo], {b = b, chave = chave})
+	end
+	b.MouseButton1Click:Connect(function()
+		pcall(cb)
+		if grupo then
+			for _, it in ipairs(grupos[grupo]) do
+				it.b.BackgroundColor3 = (it.chave == chave) and C.acc or C.btn
+			end
+		end
+		if CFG.AutoFechar then task.delay(0.12, function() main.Visible = false end) end
+	end)
+end
+
+header("FPS MÁXIMO (trava)")
+local r1 = row()
+for _, n in ipairs({30, 60, 90}) do
+	btn(r1, n .. " FPS", 85, "fps", n, function() aplicarFPS(n) status("FPS travado em " .. n) end)
+end
+
+header("QUALIDADE GRÁFICA")
+local r2 = row()
+for _, q in ipairs({"EXTREMA BAIXA", "BAIXA", "NORMAL"}) do
+	local lb = (q == "EXTREMA BAIXA") and "EXT. BAIXA" or q
+	btn(r2, lb, 85, "qual", q, function() aplicarQualidade(q) status("Qualidade: " .. q) end)
+end
+
+header("DISTÂNCIA DE RENDER")
+local r3 = row()
+btn(r3, "PERTO", 63, "dist", 150,  function() aplicarRender(150)  status("Render: perto") end)
+btn(r3, "MÉDIO", 63, "dist", 300,  function() aplicarRender(300)  status("Render: medio") end)
+btn(r3, "LONGE", 63, "dist", 600,  function() aplicarRender(600)  status("Render: longe") end)
+btn(r3, "MÁX",   63, "dist", 1200, function() aplicarRender(1200) status("Render: max") end)
+
+header("OTIMIZAÇÕES")
+local function toggle(txt, get, set, noAuto)
+	local r = row()
+	local b = Instance.new("TextButton")
+	b.Size = UDim2.new(1, 0, 0, 32)
+	b.BackgroundColor3 = get() and C.on or C.off
+	b.Text = txt .. ": " .. (get() and "LIGADO" or "DESLIGADO")
+	b.TextColor3 = C.txt b.Font = Enum.Font.GothamBold b.TextSize = 12
+	b.BorderSizePixel = 0 b.AutoButtonColor = false b.Parent = r
+	Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
+	b.MouseButton1Click:Connect(function()
+		local nv = not get()
+		pcall(set, nv)
+		b.BackgroundColor3 = nv and C.on or C.off
+		b.Text = txt .. ": " .. (nv and "LIGADO" or "DESLIGADO")
+		if CFG.AutoFechar and not noAuto then task.delay(0.15, function() main.Visible = false end) end
+	end)
+end
+toggle("SOMBRAS DESLIGADAS",   function() return CFG.SombrasOff end, aplicarSombras)
+toggle("ANIMAÇÕES DESLIGADAS", function() return CFG.AnimOff end, aplicarAnim)
+toggle("TEXTURAS NO MÍNIMO",   function() return CFG.TexMin end, aplicarTexturas)
+toggle("OTIMIZAÇÃO BRUTAL",    function() return CFG.Brutal end, aplicarBrutal)
+toggle("CULLING",              function() return CFG.Culling end, function(v)
+	CFG.Culling = v if v then rebuild() else limparCulling() end
+end)
+toggle("FECHAR AO ESCOLHER",   function() return CFG.AutoFechar end, function(v) CFG.AutoFechar = v end, true)
+
+header("AÇÕES")
+local rA = row()
+local bAp = Instance.new("TextButton")
+bAp.Size = UDim2.new(0.62, -3, 0, 38)
+bAp.BackgroundColor3 = C.acc bAp.Text = "APLICAR TUDO"
+bAp.TextColor3 = Color3.new(1,1,1) bAp.Font = Enum.Font.GothamBold
+bAp.TextSize = 13 bAp.BorderSizePixel = 0 bAp.Parent = rA
+Instance.new("UICorner", bAp).CornerRadius = UDim.new(0, 8)
+bAp.MouseButton1Click:Connect(function()
+	pcall(function()
+		aplicarQualidade(CFG.Qual) aplicarTexturas(CFG.TexMin) aplicarFPS(CFG.FPS)
+		aplicarSombras(CFG.SombrasOff) aplicarAnim(CFG.AnimOff)
+		aplicarRender(CFG.Dist) aplicarBrutal(true) rebuild()
+	end)
+	status("tudo aplicado", C.on)
+end)
+
+local bRs = Instance.new("TextButton")
+bRs.Size = UDim2.new(0.38, -3, 0, 38)
+bRs.BackgroundColor3 = C.red bRs.Text = "RESTAURAR"
+bRs.TextColor3 = Color3.new(1,1,1) bRs.Font = Enum.Font.GothamBold
+bRs.TextSize = 13 bRs.BorderSizePixel = 0 bRs.Parent = rA
+Instance.new("UICorner", bRs).CornerRadius = UDim.new(0, 8)
+bRs.MouseButton1Click:Connect(function() pcall(restaurar) status("restaurado") end)
+
+--================= APLICAR TUDO NO START =====================
+task.spawn(function()
+	pcall(function()
+		aplicarQualidade(CFG.Qual)
+		aplicarTexturas(true)
+		aplicarFPS(CFG.FPS)
+		aplicarSombras(true)
+		aplicarAnim(true)
+		aplicarRender(CFG.Dist)
+		aplicarBrutal(true)
+		rebuild()
+	end)
+	status("PRONTO - tudo ativo", C.on)
+end)
+
+--================= EXTRAS ====================================
+bind(UIS.InputBegan:Connect(function(i, gp)
+	if gp then return end
+	if i.KeyCode == Enum.KeyCode.RightShift then main.Visible = not main.Visible end
+end))
+
+local fr, ac = 0, 0
+bind(RunService.RenderStepped:Connect(function(dt)
+	fr += 1 ac += dt
+	if ac >= 0.5 then lblFps.Text = "FPS: " .. math.floor(fr/ac + 0.5) fr, ac = 0, 0 end
+end))
+
+_G.__PSX_KILL = function()
+	for _, c in ipairs(CONNS) do pcall(function() c:Disconnect() end) end
+	if fpsConn then pcall(function() fpsConn:Disconnect() end) end
+	if gui then gui:Destroy() end
+end
+
+end, function(e) return tostring(e) end)
+
+if okRun then
+	if lblStatus.Text == "STATUS: GUI criada OK" then status("PRONTO", C.on) end
+else
+	status("ERRO: " .. tostring(errRun), C.red)
+	warn("[PESADAO v3] " .. tostring(errRun))
+end
